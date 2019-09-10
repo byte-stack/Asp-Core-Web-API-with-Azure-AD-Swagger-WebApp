@@ -35,12 +35,13 @@ namespace WebApp.Controllers
                 // Using ADAL.Net, get a bearer token to access the TodoListService
                 AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
                 ClientCredential credential = new ClientCredential(AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
-                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.TodoListResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
+                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.WebApiResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
 
             }
             catch (Exception ex)
             {
-                return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
+                //return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
+                return View(new Core.Models.APIExecutionResult { GetResult = ex.Message });
             }
             return View(new Core.Models.APIExecutionResult());
         }
@@ -64,11 +65,11 @@ namespace WebApp.Controllers
                 // Using ADAL.Net, get a bearer token to access the TodoListService
                 AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
                 ClientCredential credential = new ClientCredential(Microsoft.AspNetCore.Authentication.AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
-                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.TodoListResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
+                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.WebApiResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
 
                 // Retrieve the user's To Do List.
                 HttpClient client = new HttpClient();
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, AzureAdOptions.Settings.TodoListBaseAddress + "/api/EBSBilling");
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, AzureAdOptions.Settings.WebApiBaseAddress + "/api/EBSBilling");
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
                 HttpResponseMessage response = await client.SendAsync(request);
 
@@ -138,11 +139,11 @@ namespace WebApp.Controllers
                 // Using ADAL.Net, get a bearer token to access the TodoListService
                 AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
                 ClientCredential credential = new ClientCredential(AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
-                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.TodoListResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
+                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.WebApiResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
 
                 // Retrieve the user's To Do List.
                 HttpClient client = new HttpClient();
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, AzureAdOptions.Settings.TodoListBaseAddress + "/api/EBSBilling/" + id);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, AzureAdOptions.Settings.WebApiBaseAddress + "/api/EBSBilling/" + id);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
                 HttpResponseMessage response = await client.SendAsync(request);
 
@@ -218,7 +219,7 @@ namespace WebApp.Controllers
                 // Using ADAL.Net, get a bearer token to access the TodoListService
                 AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
                 ClientCredential credential = new ClientCredential(AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
-                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.TodoListResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
+                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.WebApiResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
 
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(new BillingDetailModel
@@ -231,7 +232,7 @@ namespace WebApp.Controllers
                 }), System.Text.Encoding.UTF8, "application/json");
 
                 HttpClient client = new HttpClient();
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, AzureAdOptions.Settings.TodoListBaseAddress + "/api/EBSBilling");
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, AzureAdOptions.Settings.WebApiBaseAddress + "/api/EBSBilling");
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
                 request.Content = content;
                 HttpResponseMessage response = await client.SendAsync(request);
@@ -304,7 +305,7 @@ namespace WebApp.Controllers
                 // Using ADAL.Net, get a bearer token to access the TodoListService
                 AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
                 ClientCredential credential = new ClientCredential(AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
-                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.TodoListResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
+                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.WebApiResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
 
 
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(new BillingDetailModel
@@ -318,7 +319,7 @@ namespace WebApp.Controllers
                 }), System.Text.Encoding.UTF8, "application/json-patch+json");
 
                 HttpClient client = new HttpClient();
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, AzureAdOptions.Settings.TodoListBaseAddress + "/api/EBSBilling/1");
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, AzureAdOptions.Settings.WebApiBaseAddress + "/api/EBSBilling/1");
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
                 request.Content = content;
                 
@@ -387,10 +388,10 @@ namespace WebApp.Controllers
                 // Using ADAL.Net, get a bearer token to access the TodoListService
                 AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
                 ClientCredential credential = new ClientCredential(AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
-                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.TodoListResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
+                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.WebApiResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
 
                 HttpClient client = new HttpClient();
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, AzureAdOptions.Settings.TodoListBaseAddress + "/api/EBSBilling/"+ BillingDetailsId);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, AzureAdOptions.Settings.WebApiBaseAddress + "/api/EBSBilling/"+ BillingDetailsId);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
 
                 HttpResponseMessage response = await client.SendAsync(request);
@@ -437,84 +438,11 @@ namespace WebApp.Controllers
             return View("Error");
         }
 
-
-
-
-
-
-        /*
-                [HttpPost]
-                public async Task<ActionResult> Index(string item)
-                {
-                    if (ModelState.IsValid)
-                    {
-                        //
-                        // Retrieve the user's tenantID and access token since they are parameters used to call the To Do service.
-                        //
-                        AuthenticationResult result = null;
-                        List<TodoItem> itemList = new List<TodoItem>();
-
-                        try
-                        {
-                            string userObjectID = (User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
-                            AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
-                            ClientCredential credential = new ClientCredential(AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
-                            result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.TodoListResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
-
-                            // Forms encode todo item, to POST to the todo list web api.
-                            HttpContent content = new StringContent(JsonConvert.SerializeObject(new { Title = item }), System.Text.Encoding.UTF8, "application/json");
-
-                            //
-                            // Add the item to user's To Do List.
-                            //
-                            HttpClient client = new HttpClient();
-                            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, AzureAdOptions.Settings.TodoListBaseAddress + "/api/todolist");
-                            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
-                            request.Content = content;
-                            HttpResponseMessage response = await client.SendAsync(request);
-
-                            //
-                            // Return the To Do List in the view.
-                            //
-                            if (response.IsSuccessStatusCode)
-                            {
-                                return RedirectToAction("Index");
-                            }
-
-                            //
-                            // If the call failed with access denied, then drop the current access token from the cache, 
-                            //     and show the user an error indicating they might need to sign-in again.
-                            //
-                            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                            {
-                                return ProcessUnauthorized(itemList, authContext);
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            //
-                            // The user needs to re-authorize.  Show them a message to that effect.
-                            //
-                            TodoItem newItem = new TodoItem();
-                            newItem.Title = "(No items in list)";
-                            itemList.Add(newItem);
-                            ViewBag.ErrorMessage = "AuthorizationRequired";
-                            return View(itemList);
-                        }
-                        //
-                        // If the call failed for any other reason, show the user an error.
-                        //
-                        return View("Error");
-                    }
-                    return View("Error");
-                }
-                */
-
         private ActionResult ProcessUnauthorized(AuthenticationContext authContext)
         {
 
-            var todoTokens = authContext.TokenCache.ReadItems().Where(a => a.Resource == AzureAdOptions.Settings.TodoListResourceId);
-            foreach (TokenCacheItem tci in todoTokens)
+            var WebApiTokens = authContext.TokenCache.ReadItems().Where(a => a.Resource == AzureAdOptions.Settings.WebApiResourceId);
+            foreach (TokenCacheItem tci in WebApiTokens)
                 authContext.TokenCache.DeleteItem(tci);
 
             ViewBag.ErrorMessage = "UnexpectedError";

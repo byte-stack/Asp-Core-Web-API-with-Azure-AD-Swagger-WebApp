@@ -51,12 +51,12 @@
         /// <summary>
         /// Client Id (Application ID) of the TodoListService, obtained from the Azure portal for that application
         /// </summary>
-        public string TodoListResourceId { get; set; }
+        public string WebApiResourceId { get; set; }
 
         /// <summary>
         /// Base URL of the TodoListService
         /// </summary>
-        public string TodoListBaseAddress { get; set; }
+        public string WebApiBaseAddress { get; set; }
 
         /// <summary>
         /// Instance of the settings for this Web application (to be used in controllers)
