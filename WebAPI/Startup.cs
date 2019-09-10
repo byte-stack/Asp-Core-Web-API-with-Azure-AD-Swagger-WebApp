@@ -62,7 +62,6 @@ namespace WebAPI
                 c.OAuthRealm(Configuration["AzureAD:ClientId"]);
                 c.OAuthAppName("EBS Web API v1");
                 c.OAuthScopeSeparator(" ");
-                //c.OAuthAdditionalQueryStringParams( = Configuration["AzureAD:ClientId"] });
                 c.OAuthAdditionalQueryStringParams(new Dictionary<string, string>() { { "resource", Configuration["AzureAD:ClientId"] } });
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "EBS Web API v1");
             });
