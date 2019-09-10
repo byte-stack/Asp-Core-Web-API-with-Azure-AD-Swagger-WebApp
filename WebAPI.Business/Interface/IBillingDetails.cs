@@ -31,7 +31,6 @@ namespace WebAPI.Business.Interface
         /// <summary>
         /// Update the billing details
         /// </summary>
-        /// <param name="Id">Billing Id</param>
         /// <param name="billingDetails">billing class object model</param>
         void Put(BillingDetailModel billingDetails);
 

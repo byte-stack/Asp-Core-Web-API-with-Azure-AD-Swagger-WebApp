@@ -13,11 +13,24 @@ using Xunit;
 
 namespace WebAPI.XUnitTest.API
 {
+    /// <summary>
+    /// Web Api  Test Class
+    /// </summary>
     public class WebApiUnitTest
     {
+        /// <summary>
+        /// Web api controller object
+        /// </summary>
         readonly EBSBillingController _controller;
+
+        /// <summary>
+        /// Interface of billing details
+        /// </summary>
         readonly IBillingDetails _service;
 
+        /// <summary>
+        /// Default constructor 
+        /// </summary>
         public WebApiUnitTest()
         {
             _service = new IBillingDetailsFake();
@@ -25,6 +38,11 @@ namespace WebAPI.XUnitTest.API
         }
 
         #region  Get Test cases
+
+
+        /// <summary>
+        /// Test the billing details- all record
+        /// </summary>
         [Fact]
         public void Get()
         {
@@ -35,7 +53,9 @@ namespace WebAPI.XUnitTest.API
             Assert.NotNull(results);
         }
 
-
+        /// <summary>
+        /// Test the Get method by passing wrong billing id
+        /// </summary>
         [Fact]
         public void Get_UnknownIdPassed_ReturnsNotFoundResult()
         {
@@ -46,7 +66,9 @@ namespace WebAPI.XUnitTest.API
             Assert.Null(notFoundResult.Result);
         }
 
-
+        /// <summary>
+        /// Test the get method by passing the correct billing details id
+        /// </summary>
         [Fact]
         public void Get_ExistingIdPassed_ReturnsOkResult()
         {
@@ -62,6 +84,10 @@ namespace WebAPI.XUnitTest.API
         #endregion
 
         #region POST Test cases
+
+        /// <summary>
+        /// Test the POST method for invalid case with amount is missing in the Billing details model
+        /// </summary>
         [Fact]
         public void Post_InvalidObjectPassed()
         {
@@ -83,7 +109,7 @@ namespace WebAPI.XUnitTest.API
                 // Assert
                 Assert.True(true);
             }
-            catch(Exception ex)
+            catch (Exception)
             {
                 // Assert
                 Assert.True(true);
@@ -91,7 +117,9 @@ namespace WebAPI.XUnitTest.API
             
         }
 
-        
+        /// <summary>
+        /// Test the POST method for valid billing details model
+        /// </summary>
         [Fact]
         public void Post_ValidObjectPassed()
         {
@@ -126,6 +154,10 @@ namespace WebAPI.XUnitTest.API
         #endregion
 
         #region Put
+
+        /// <summary>
+        /// Test method for PUT with invalid case using incorrect user id
+        /// </summary>
         [Fact]
         public void Put_InvalidObjectPassed()
         {
@@ -146,7 +178,7 @@ namespace WebAPI.XUnitTest.API
                 // Assert
                 Assert.True(true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Assert
                 Assert.True(true);
@@ -154,7 +186,9 @@ namespace WebAPI.XUnitTest.API
 
         }
 
-
+        /// <summary>
+        /// Put test valid case with correct user id
+        /// </summary>
         [Fact]
         public void Put_ValidObjectPassed()
         {
@@ -176,7 +210,7 @@ namespace WebAPI.XUnitTest.API
                 // Assert
                 Assert.True(true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Assert
                 Assert.True(true);
@@ -187,6 +221,9 @@ namespace WebAPI.XUnitTest.API
 
         #region Delete 
 
+        /// <summary>
+        /// Delete Test Case with invalid billing details id 
+        /// </summary>
         [Fact]
         public void Delete_NotExistingIdPassed_ReturnsNotFoundResponse()
         {
@@ -207,6 +244,9 @@ namespace WebAPI.XUnitTest.API
             }
         }
 
+        /// <summary>
+        /// Delete case with correct billing details id
+        /// </summary>
         [Fact]
         public void Delete_ExistingIdPassed_ReturnsOkResult()
         {
@@ -221,7 +261,7 @@ namespace WebAPI.XUnitTest.API
                 // Assert
                 Assert.True(true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Assert.True(false);
             }
