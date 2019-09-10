@@ -1,0 +1,116 @@
+﻿@model WebApp.Core.Models.APIExecutionResult
+
+@{
+    ViewData["Title"] = "Billing API console.";
+}
+
+<h1>API test console.</h1>
+
+
+<style></style>
+
+<!---Get-->
+<div class="container text-left align-self-center" style="margin-top:10%">
+
+
+    <div class="row vertical-center">
+
+        <div class="col-sm-2">
+            /api/GET
+        </div>
+        <div class="col-sm-7">
+            <form asp-action="Get" asp-controller="Billing" method="get">
+                <button class="btn-primary">Trigger</button>
+            </form>
+        </div>
+        <div class="col-sm-3">
+
+            @Model.GetResult
+
+        </div>
+    </div>
+
+    <div class="clearfix">&nbsp;</div>
+
+    <!---Get with id-->
+    <div class="row">
+        <div class="col-sm-2">
+            /api/GET/{id}
+        </div>
+        <div class="col-sm-5">
+
+
+
+            <form asp-action="GetById" asp-controller="Billing" method="get">
+
+                <input type="text" value="1" id="id" name="id" />
+                <button class="btn-primary">Trigger</button>
+            </form>
+
+        </div>
+        <div class="col-sm-5">
+
+            @Model.GetByIdResult
+
+        </div>
+    </div>
+    <div class="clearfix">&nbsp;</div>
+    <!---Post-->
+    <div class="row">
+        <div class="col-sm-2">
+            /api/POST
+        </div>
+        <div class="col-sm-5">
+            <form asp-action="Post" asp-controller="Billing" method="post">
+                <input type="text" id="amount" placeholder="Billing amount" />
+                <button class="btn-primary">Trigger</button>
+            </form>
+        </div>
+        <div class="col-sm-5">
+
+            @Model.PostResult
+
+        </div>
+    </div>
+
+    <div class="clearfix">&nbsp;</div>
+    <!---PUt-->
+    <div class="row">
+        <div class="col-sm-2">
+            /api/PUT
+        </div>
+        <div class="col-sm-5">
+            <form asp-action="put" asp-controller="Billing" method="put">
+
+                <input type="text" value="1" id="billingId" name="billingId" style="max-width:20%;" />
+
+                <input type="text" id="amount" placeholder="Amount" value="50.20" style="max-width:23%;" />
+                <button class="btn-primary">Trigger</button>
+            </form>
+        </div>
+        <div class="col-sm-5">
+
+            @Model.PutResult
+
+        </div>
+    </div>
+
+    <div class="clearfix">&nbsp;</div>
+    <!---Delete-->
+    <div class="row">
+        <div class="col-sm-2">
+            /api/Delete
+        </div>
+        <div class="col-sm-5">
+            <form asp-action="delete" asp-controller="Billing" method="delete">
+                <input type="text" value="0" id="billingId" name="billingId" />
+                <button class="btn-primary">Trigger</button>
+            </form>
+        </div>
+        <div class="col-sm-5">
+
+            @Model.DeleteResult
+
+        </div>
+    </div>
+</div>
