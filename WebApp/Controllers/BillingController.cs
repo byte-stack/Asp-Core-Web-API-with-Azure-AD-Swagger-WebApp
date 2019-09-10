@@ -40,8 +40,8 @@ namespace WebApp.Controllers
             }
             catch (Exception ex)
             {
-                //return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
-                return View(new Core.Models.APIExecutionResult { GetResult = ex.Message });
+                return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
+                //return View(new Core.Models.APIExecutionResult { GetResult = ex.Message });
             }
             return View(new Core.Models.APIExecutionResult());
         }

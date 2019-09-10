@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Business.Interface;
-using WebAPI.Business.Logic;
 using WebAPI.Business.Models;
 
 namespace WebAPI.Controllers
 {
+
+    /// <summary>
+    /// EBS controller for implementation the basic operation of web api
+    /// </summary>
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
