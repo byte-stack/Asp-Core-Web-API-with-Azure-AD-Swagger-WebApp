@@ -40,6 +40,7 @@ namespace WebAPI
                     Flow = "implicit",
                     AuthorizationUrl = $"https://login.microsoftonline.com/{Configuration["AzureAD:TenantId"]}/oauth2/authorize",
                     Scopes = new Dictionary<string, string>{{ "user_impersonation", "Access API" }}
+                   
                 });
                 c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>{{ "oauth2", new[] { "user_impersonation" } }});
             });

@@ -66,9 +66,9 @@ namespace WebAPI.Controllers
         /// <param name="id">Billing details id</param>
         /// <param name="billingDetailModel">Billing details model</param>
         [HttpPut("{id}")]
-        public void Put(long id, BillingDetailModel billingDetailModel)
+        public void Put(BillingDetailModel billingDetailModel)
         {
-            IBillingDetails.Put(id, billingDetailModel);
+            IBillingDetails.Put(billingDetailModel);
         }
 
         /// <summary>

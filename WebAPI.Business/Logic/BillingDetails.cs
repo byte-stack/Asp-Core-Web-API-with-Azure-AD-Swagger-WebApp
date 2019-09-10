@@ -50,7 +50,7 @@ namespace WebAPI.Business.Logic
             });
         }
 
-        public void Put(long Id, BillingDetailModel billingDetails)
+        public void Put(BillingDetailModel billingDetails)
         {
             iBillingRepository.Put(new DataServices.Table.BillingDetails
             {
@@ -58,13 +58,13 @@ namespace WebAPI.Business.Logic
                 BillingCycleId = billingDetails.BillingCycleId,
                 CreatedDate = billingDetails.CreatedDate,
                 UserId = billingDetails.UserId,
-                Id=Id
+                Id= billingDetails.Id
             });
         }
 
         public void Delete(long id)
         {
-            throw new NotImplementedException();
+            iBillingRepository.Delete(id);
         }
 
     }

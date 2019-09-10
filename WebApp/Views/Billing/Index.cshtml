@@ -62,7 +62,7 @@
         </div>
         <div class="col-sm-5">
             <form asp-action="Post" asp-controller="Billing" method="post">
-                <input type="text" id="amount" placeholder="Billing amount" />
+                <input type="text" id="amount" placeholder="Billing amount" name="amount" required />
                 <button class="btn-primary">Trigger</button>
             </form>
         </div>
@@ -82,9 +82,9 @@
         <div class="col-sm-5">
             <form asp-action="put" asp-controller="Billing" method="put">
 
-                <input type="text" value="1" id="billingId" name="billingId" style="max-width:20%;" />
+                <input type="text" value="1" id="id" name="id" style="max-width:20%;" />
 
-                <input type="text" id="amount" placeholder="Amount" value="50.20" style="max-width:23%;" />
+                <input type="text" id="putamount" name="putamount" placeholder="Amount" value="0" style="max-width:23%;" />
                 <button class="btn-primary">Trigger</button>
             </form>
         </div>
@@ -103,7 +103,7 @@
         </div>
         <div class="col-sm-5">
             <form asp-action="delete" asp-controller="Billing" method="delete">
-                <input type="text" value="0" id="billingId" name="billingId" />
+                <input type="text" value="0" id="id" name="id" />
                 <button class="btn-primary">Trigger</button>
             </form>
         </div>

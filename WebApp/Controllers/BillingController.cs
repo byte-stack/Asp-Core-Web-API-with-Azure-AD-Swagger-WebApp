@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
+using WebAPI.Business.Models;
 using WebApp.Core;
 
 
@@ -77,7 +78,7 @@ namespace WebApp.Controllers
                     List<Dictionary<string, string>> responseElements = new List<Dictionary<String, String>>();
                     JsonSerializerSettings settings = new JsonSerializerSettings();
                     string responseString = await response.Content.ReadAsStringAsync();
-                    
+
                     return View("Index", new Core.Models.APIExecutionResult { GetResult = responseString });
                 }
 
@@ -124,7 +125,7 @@ namespace WebApp.Controllers
         }
 
 
-        public async Task<IActionResult> GetByIdAsync(long id)
+        public async Task<IActionResult> GetById(long id)
         {
             AuthenticationResult result = null;
             // List<TodoItem> itemList = new List<TodoItem>();
@@ -141,7 +142,7 @@ namespace WebApp.Controllers
 
                 // Retrieve the user's To Do List.
                 HttpClient client = new HttpClient();
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, AzureAdOptions.Settings.TodoListBaseAddress + "/api/EBSBilling?id="+id);
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, AzureAdOptions.Settings.TodoListBaseAddress + "/api/EBSBilling/" + id);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
                 HttpResponseMessage response = await client.SendAsync(request);
 
@@ -152,7 +153,7 @@ namespace WebApp.Controllers
                     JsonSerializerSettings settings = new JsonSerializerSettings();
                     string responseString = await response.Content.ReadAsStringAsync();
 
-                    return View("Index", new Core.Models.APIExecutionResult { GetResult = responseString });
+                    return View("Index", new Core.Models.APIExecutionResult { GetByIdResult = responseString });
                 }
 
                 //
@@ -195,24 +196,245 @@ namespace WebApp.Controllers
             return View("Error");
         }
 
+
+
         [HttpPost]
-        public IActionResult Post()
+        public async Task<IActionResult> Post()
         {
-            return View("Index", new Core.Models.APIExecutionResult { PostResult = "post" });
+            AuthenticationResult result = null;
+            // List<TodoItem> itemList = new List<TodoItem>();
+            var Amount = Request.Form["amount"];
+
+            if (!decimal.TryParse(Amount, out _))
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                // Because we signed-in already in the WebApp, the userObjectId is know
+                string userObjectID = (User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
+
+                // Using ADAL.Net, get a bearer token to access the TodoListService
+                AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
+                ClientCredential credential = new ClientCredential(AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
+                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.TodoListResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
+
+
+                HttpContent content = new StringContent(JsonConvert.SerializeObject(new BillingDetailModel
+                {
+                    Amount = Convert.ToDecimal(Amount),
+                    BillingCycleId = 1,
+                    UserId = 1,
+                    CreatedDate = DateTime.Now
+
+                }), System.Text.Encoding.UTF8, "application/json");
+
+                HttpClient client = new HttpClient();
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, AzureAdOptions.Settings.TodoListBaseAddress + "/api/EBSBilling");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+                request.Content = content;
+                HttpResponseMessage response = await client.SendAsync(request);
+
+
+                // Return the To Do List in the view.
+                if (response.IsSuccessStatusCode)
+                {
+                    List<Dictionary<string, string>> responseElements = new List<Dictionary<String, String>>();
+                    JsonSerializerSettings settings = new JsonSerializerSettings();
+                    string responseString = await response.Content.ReadAsStringAsync();
+
+                    return View("Index", new Core.Models.APIExecutionResult { PostResult = "200. Success" });
+                }
+
+                //
+                // If the call failed with access denied, then drop the current access token from the cache, 
+                //     and show the user an error indicating they might need to sign-in again.
+                //
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    return ProcessUnauthorized(authContext);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+
+                if (HttpContext.Request.Query["reauth"] == "True")
+                {
+                    //
+                    // Send an OpenID Connect sign-in request to get a new set of tokens.
+                    // If the user still has a valid session with Azure AD, they will not be prompted for their credentials.
+                    // The OpenID Connect middleware will return to this controller after the sign-in response has been handled.
+                    //
+                    return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
+                }
+
+                ViewBag.ErrorMessage = "AuthorizationRequired";
+                return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
+
+            }
+
+            return View("Error");
         }
 
 
-
-        [HttpPut("{id}")]
-        public IActionResult Put(long id, string data)
+        public async Task<IActionResult> Put()
         {
-            return View("Index", new Core.Models.APIExecutionResult { PutResult = id + "id res" });
+            AuthenticationResult result = null;
+            
+
+            var Amount = Request.Query["putamount"];
+            var BillingDetailsId = Request.Query["id"];
+            if (!decimal.TryParse(Amount, out _))
+            {
+                return BadRequest();
+            }
+
+            if (!decimal.TryParse(BillingDetailsId, out _))
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                // Because we signed-in already in the WebApp, the userObjectId is know
+                string userObjectID = (User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
+
+                // Using ADAL.Net, get a bearer token to access the TodoListService
+                AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
+                ClientCredential credential = new ClientCredential(AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
+                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.TodoListResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
+
+
+                HttpContent content = new StringContent(JsonConvert.SerializeObject(new BillingDetailModel
+                {
+                    Amount = 1,
+                    BillingCycleId = 1,
+                    UserId = 1,
+                    CreatedDate = DateTime.Now.Date,
+                    Id= Convert.ToInt64(1)
+
+                }), System.Text.Encoding.UTF8, "application/json-patch+json");
+
+                HttpClient client = new HttpClient();
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, AzureAdOptions.Settings.TodoListBaseAddress + "/api/EBSBilling/1");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+                request.Content = content;
+                
+                HttpResponseMessage response = await client.SendAsync(request);
+
+
+                // Return the To Do List in the view.
+                if (response.IsSuccessStatusCode)
+                {
+                    List<Dictionary<string, string>> responseElements = new List<Dictionary<String, String>>();
+                    JsonSerializerSettings settings = new JsonSerializerSettings();
+                    string responseString = await response.Content.ReadAsStringAsync();
+
+                    return View("Index", new Core.Models.APIExecutionResult { PutResult = "200. Success" });
+                }
+
+                //
+                // If the call failed with access denied, then drop the current access token from the cache, 
+                //     and show the user an error indicating they might need to sign-in again.
+                //
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    return ProcessUnauthorized(authContext);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                
+                if (HttpContext.Request.Query["reauth"] == "True")
+                {
+                    //
+                    // Send an OpenID Connect sign-in request to get a new set of tokens.
+                    // If the user still has a valid session with Azure AD, they will not be prompted for their credentials.
+                    // The OpenID Connect middleware will return to this controller after the sign-in response has been handled.
+                    //
+                    return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
+                }
+
+                ViewBag.ErrorMessage = "AuthorizationRequired";
+                return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
+
+            }
+
+            return View("Error");
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(long id)
+        
+        public async Task<IActionResult> Delete()
         {
-            return View("Index", new Core.Models.APIExecutionResult { DeleteResult = id + "id res" });
+            AuthenticationResult result = null;
+
+            var BillingDetailsId = Request.Query["id"];
+          
+
+            if (!decimal.TryParse(BillingDetailsId, out _))
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                // Because we signed-in already in the WebApp, the userObjectId is know
+                string userObjectID = (User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier"))?.Value;
+
+                // Using ADAL.Net, get a bearer token to access the TodoListService
+                AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
+                ClientCredential credential = new ClientCredential(AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
+                result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.TodoListResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
+
+                HttpClient client = new HttpClient();
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, AzureAdOptions.Settings.TodoListBaseAddress + "/api/EBSBilling/"+ BillingDetailsId);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+
+                HttpResponseMessage response = await client.SendAsync(request);
+
+
+                // Return the To Do List in the view.
+                if (response.IsSuccessStatusCode)
+                {
+                    List<Dictionary<string, string>> responseElements = new List<Dictionary<String, String>>();
+                    JsonSerializerSettings settings = new JsonSerializerSettings();
+                    string responseString = await response.Content.ReadAsStringAsync();
+
+                    return View("Index", new Core.Models.APIExecutionResult { DeleteResult = "200. Success" });
+                }
+
+                //
+                // If the call failed with access denied, then drop the current access token from the cache, 
+                //     and show the user an error indicating they might need to sign-in again.
+                //
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    return ProcessUnauthorized(authContext);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+
+                if (HttpContext.Request.Query["reauth"] == "True")
+                {
+                    //
+                    // Send an OpenID Connect sign-in request to get a new set of tokens.
+                    // If the user still has a valid session with Azure AD, they will not be prompted for their credentials.
+                    // The OpenID Connect middleware will return to this controller after the sign-in response has been handled.
+                    //
+                    return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
+                }
+
+                ViewBag.ErrorMessage = "AuthorizationRequired";
+                return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
+
+            }
+
+            return View("Error");
         }
 
 
@@ -290,14 +512,15 @@ namespace WebApp.Controllers
 
         private ActionResult ProcessUnauthorized(AuthenticationContext authContext)
         {
+
             var todoTokens = authContext.TokenCache.ReadItems().Where(a => a.Resource == AzureAdOptions.Settings.TodoListResourceId);
             foreach (TokenCacheItem tci in todoTokens)
                 authContext.TokenCache.DeleteItem(tci);
 
             ViewBag.ErrorMessage = "UnexpectedError";
 
-
-            return View("");
+            //return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
+            return View("Error");
         }
     }
 }

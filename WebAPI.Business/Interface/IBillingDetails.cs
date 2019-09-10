@@ -33,7 +33,7 @@ namespace WebAPI.Business.Interface
         /// </summary>
         /// <param name="Id">Billing Id</param>
         /// <param name="billingDetails">billing class object model</param>
-        void Put(long Id,BillingDetailModel billingDetails);
+        void Put(BillingDetailModel billingDetails);
 
         /// <summary>
         /// Remove the billing details from the system
