@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Business.Interface;
 using WebAPI.Business.Logic;
@@ -34,6 +35,7 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <returns>returns list of billing objects</returns>
         [HttpGet]
+        [EnableCors("AllowSpecificOrigins")]
         public ActionResult<IEnumerable<BillingDetailModel>> Get()
         {
             return IBillingDetails.Get().ToList();
@@ -45,6 +47,7 @@ namespace WebAPI.Controllers
         /// <param name="id">Billing details Id</param>
         /// <returns>returns list of billing objects</returns>
         [HttpGet("{id}")]
+        [EnableCors("AllowSpecificOrigins")]
         public ActionResult<BillingDetailModel> Get(long id)
         {
             return IBillingDetails.Get(id);
@@ -55,6 +58,7 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="billingDetailModel">Billing details model </param>
         [HttpPost]
+        [EnableCors("AllowSpecificOrigins")]
         public void Post(BillingDetailModel billingDetailModel)
         {
             IBillingDetails.Post(billingDetailModel);
@@ -66,6 +70,7 @@ namespace WebAPI.Controllers
         /// <param name="id">Billing details id</param>
         /// <param name="billingDetailModel">Billing details model</param>
         [HttpPut("{id}")]
+        [EnableCors("AllowSpecificOrigins")]
         public void Put(BillingDetailModel billingDetailModel)
         {
             IBillingDetails.Put(billingDetailModel);
@@ -76,6 +81,7 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="id">Billing details id</param>
         [HttpDelete("{id}")]
+        [EnableCors("AllowSpecificOrigins")]
         public void Delete(long id)
         {
             IBillingDetails.Delete(id);

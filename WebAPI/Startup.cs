@@ -21,6 +21,7 @@ namespace WebAPI
         }
 
         public IConfiguration Configuration { get; }
+        readonly string AllowSpecificOrigins = "AllowSpecificOrigins";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -39,15 +40,33 @@ namespace WebAPI
                     Type = "oauth2",
                     Flow = "implicit",
                     AuthorizationUrl = $"https://login.microsoftonline.com/{Configuration["AzureAD:TenantId"]}/oauth2/authorize",
-                    Scopes = new Dictionary<string, string>{{ "user_impersonation", "Access API" }}
-                   
+                    Scopes = new Dictionary<string, string> { { "user_impersonation", "Access API" } }
+
                 });
-                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>{{ "oauth2", new[] { "user_impersonation" } }});
+                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> { { "oauth2", new[] { "user_impersonation" } } });
             });
 
 
             services.AddScoped<IBillingDetails, BillingDetails>();
             services.AddScoped<DataServices.Contracts.IBillingRepository, DataServices.Repositories.BillingRepository>();
+
+
+            #region CORS Policy
+
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(AllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.WithOrigins("https://localhost:44385",
+                            "http://webappaspcore.azurewebsites.net").
+                            WithMethods("GET", "POST", "PUT", "DELETE");
+                    });
+
+            });
+            
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,16 +91,17 @@ namespace WebAPI
             }
             else
             {
-             
+
                 app.UseHsts();
             }
-
+         
             app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "EBS Web API");
-                c.RoutePrefix = string.Empty;
-            });
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "EBS Web API");
+            c.RoutePrefix = string.Empty;
+        });
 
+            app.UseCors(AllowSpecificOrigins);
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseMvc();
