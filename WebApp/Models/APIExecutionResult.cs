@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace WebApp.Core.Models
 {
+    /// <summary>
+    /// Model class to process the result from the api at the view
+    /// </summary>
     public class APIExecutionResult
     {
         public string GetResult { get; set; }

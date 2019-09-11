@@ -10,9 +10,20 @@ namespace Microsoft.AspNetCore.Authentication
 {
     public static class AzureAdAuthenticationBuilderExtensions
     {
+        /// <summary>
+        /// Azure Ad builder 
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public static AuthenticationBuilder AddAzureAd(this AuthenticationBuilder builder)
             => builder.AddAzureAd(_ => { });
 
+        /// <summary>
+        /// Builder constructor 
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configureOptions"></param>
+        /// <returns></returns>
         public static AuthenticationBuilder AddAzureAd(this AuthenticationBuilder builder, Action<AzureAdOptions> configureOptions)
         {
             builder.Services.Configure(configureOptions);
@@ -21,6 +32,9 @@ namespace Microsoft.AspNetCore.Authentication
             return builder;
         }
 
+        /// <summary>
+        /// Default setting setup and other resource mapping to azure account
+        /// </summary>
         private class ConfigureAzureOptions : IConfigureNamedOptions<OpenIdConnectOptions>
         {
             private readonly AzureAdOptions _azureOptions;

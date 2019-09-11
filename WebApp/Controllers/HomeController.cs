@@ -9,10 +9,16 @@ using WebApp.Models;
 
 namespace WebApp.Controllers
 {
+    /// <summary>
+    /// Azure Ad 
+    /// </summary>
     [Authorize]
     public class HomeController : Controller
     {
-
+        /// <summary>
+        /// Home page view
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
             return View();

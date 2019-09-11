@@ -14,7 +14,6 @@ using Newtonsoft.Json;
 using WebAPI.Business.Models;
 using WebApp.Core;
 
-
 namespace WebApp.Controllers
 {
     [Authorize]
@@ -45,7 +44,6 @@ namespace WebApp.Controllers
             }
             return View(new Core.Models.APIExecutionResult());
         }
-
 
         /// <summary>
         /// Get method to test the get method of Web api
@@ -106,26 +104,18 @@ namespace WebApp.Controllers
                     return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
                 }
 
-                //
-                // The user needs to re-authorize.  Show them a message to that effect.
-                //
-
-                //                newItem.Title = "(Sign-in required to view to do list.)";
-
-                //ViewBag.ErrorMessage = "AuthorizationRequired";
                 return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
-                //return View();
+             
             }
 
-            //
-            // If the call failed for any other reason, show the user an error.
-            //
             return View("Error");
-
-
         }
 
-
+        /// <summary>
+        /// Get the billing details for the given billing id
+        /// </summary>
+        /// <param name="id">billing details id</param>
+        /// <returns></returns>
         public async Task<IActionResult> GetById(long id)
         {
             AuthenticationResult result = null;
@@ -180,30 +170,23 @@ namespace WebApp.Controllers
                     return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
                 }
 
-                //
-                // The user needs to re-authorize.  Show them a message to that effect.
-                //
-
-                //                newItem.Title = "(Sign-in required to view to do list.)";
-
-                //ViewBag.ErrorMessage = "AuthorizationRequired";
+               
                 return new ChallengeResult(OpenIdConnectDefaults.AuthenticationScheme);
-                //return View();
+              
             }
 
-            //
-            // If the call failed for any other reason, show the user an error.
-            //
+        
             return View("Error");
         }
 
-
-
+        /// <summary>
+        /// Saves the billing details 
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Post()
         {
             AuthenticationResult result = null;
-            // List<TodoItem> itemList = new List<TodoItem>();
+         
             var Amount = Request.Form["amount"];
 
             if (!decimal.TryParse(Amount, out _))
@@ -279,14 +262,16 @@ namespace WebApp.Controllers
             return View("Error");
         }
 
-
+        /// <summary>
+        /// Update the billing details
+        /// </summary>
         public async Task<IActionResult> Put()
         {
             AuthenticationResult result = null;
-            
-
             var Amount = Request.Query["putamount"];
             var BillingDetailsId = Request.Query["id"];
+            
+            //parse the amount and billing details
             if (!decimal.TryParse(Amount, out _))
             {
                 return BadRequest();
@@ -306,8 +291,7 @@ namespace WebApp.Controllers
                 AuthenticationContext authContext = new AuthenticationContext(AzureAdOptions.Settings.Authority, new NaiveSessionCache(userObjectID, HttpContext.Session));
                 ClientCredential credential = new ClientCredential(AzureAdOptions.Settings.ClientId, AzureAdOptions.Settings.ClientSecret);
                 result = await authContext.AcquireTokenSilentAsync(AzureAdOptions.Settings.WebApiResourceId, credential, new UserIdentifier(userObjectID, UserIdentifierType.UniqueId));
-
-
+                
                 HttpContent content = new StringContent(JsonConvert.SerializeObject(new BillingDetailModel
                 {
                     Amount = 1,
@@ -367,14 +351,15 @@ namespace WebApp.Controllers
             return View("Error");
         }
 
-        
+        /// <summary>
+        /// Remove the billing details from the system
+        /// </summary>
         public async Task<IActionResult> Delete()
         {
             AuthenticationResult result = null;
 
             var BillingDetailsId = Request.Query["id"];
           
-
             if (!decimal.TryParse(BillingDetailsId, out _))
             {
                 return BadRequest();
@@ -438,9 +423,13 @@ namespace WebApp.Controllers
             return View("Error");
         }
 
+        /// <summary>
+        /// Process the unauthorized request
+        /// </summary>
+        /// <param name="authContext">AuthenticationContext</param>
+        /// <returns></returns>
         private ActionResult ProcessUnauthorized(AuthenticationContext authContext)
         {
-
             var WebApiTokens = authContext.TokenCache.ReadItems().Where(a => a.Resource == AzureAdOptions.Settings.WebApiResourceId);
             foreach (TokenCacheItem tci in WebApiTokens)
                 authContext.TokenCache.DeleteItem(tci);
